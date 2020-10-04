@@ -9,11 +9,22 @@ class MyWorker(appContext: Context, workerParams: WorkerParameters) : Worker(app
 
     private val myWorkerTag = "MY_WORKER"
 
-    override fun doWork(): Result {
+    companion object {
+        private var lastWorkTime: Long? = null
+    }
 
-        val workText = "My worker task is done"
+    override fun doWork(): Result {
+        val workText = "My worker task is done "
+        val actualTime = System.currentTimeMillis()
+        var timeText = ""
+
+        if (lastWorkTime != null) {
+            timeText = "after ${(actualTime - lastWorkTime!!) / 60000} minutes"
+        }
+
         Log.i(myWorkerTag, workText)
-        ImmediateManager().getSpeaker()?.speak(workText)
+        ImmediateManager().getSpeaker()?.speak(workText + timeText)
+        lastWorkTime = actualTime
 
         // Indicate whether the work finished successfully with the Result
         return Result.success()
